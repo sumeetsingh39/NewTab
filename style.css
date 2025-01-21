@@ -80,7 +80,7 @@ input:focus-visible {
   margin-bottom: 0.5rem;
 }
 .quick-link span {
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: var(--text-secondary);
 }
 .quick-link:hover span {
@@ -402,7 +402,7 @@ input:focus-visible {
   padding: 0.5rem;
   background: transparent;
   border: 1px solid var(--text-secondary);
-  font-size: 0.875rem;
+  font-size: 0.95rem;
 }
 
 .add-task-button,
@@ -486,6 +486,7 @@ input:focus-visible {
   padding: 0.5rem;
   background-color: var(--text-primary);
   color: var(--background);
+  font-size: 1rem;
 }
 .weather-section #weather-container {
   display: flex;
@@ -493,7 +494,6 @@ input:focus-visible {
   justify-content: center;
 }
 .weather-section .edit {
-  font-size: 1rem;
   padding: 0.2rem;
   height: 20px;
   width: 20px;
@@ -504,16 +504,10 @@ input:focus-visible {
   border-radius: 16px;
   cursor: pointer;
 }
-.weather-section .location-name {
-  font-size: 1rem;
-}
 .weather-section .temperature {
   display: flex;
   align-items: center;
 }
 .weather-section .temperature img {
   width: 1rem;
-}
-.weather-section .temperature span {
-  font-size: 1rem;
 }/*# sourceMappingURL=style.css.map */

@@ -86,7 +86,7 @@ input:focus-visible {
   }
 
   span {
-    font-size: 0.875rem;
+    font-size: 1rem;
     color: var(--text-secondary);
   }
 
@@ -417,7 +417,7 @@ input:focus-visible {
   padding: 0.5rem;
   background: transparent;
   border: 1px solid var(--text-secondary);
-  font-size: 0.875rem;
+  font-size: 0.95rem;
 }
 
 .add-task-button,
@@ -502,13 +502,13 @@ input:focus-visible {
   padding: 0.5rem;
   background-color: var(--text-primary);
   color: var(--background);
+  font-size: 1rem;
   #weather-container {
     display: flex;
     gap: 1rem;
     justify-content: center;
   }
   .edit {
-    font-size: 1rem;
     padding: 0.2rem;
     height: 20px;
     width: 20px;
@@ -521,7 +521,6 @@ input:focus-visible {
   }
 
   .location-name {
-    font-size: 1rem;
   }
 
   .temperature {
@@ -530,10 +529,6 @@ input:focus-visible {
 
     img {
       width: 1rem;
-    }
-
-    span {
-      font-size: 1rem;
     }
   }
 }
