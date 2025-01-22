@@ -413,19 +413,19 @@ input:focus-visible {
   font-size: 1rem;
 }
 
-.priority-p1 {
+.priority-p4 {
   color: #dd3418;
 }
 
-.priority-p2 {
+.priority-p3 {
   color: #ff9667;
 }
 
-.priority-p3 {
+.priority-p2 {
   color: #10387b;
 }
 
-.priority-p4 {
+.priority-p1 {
   color: #808080;
 }
 

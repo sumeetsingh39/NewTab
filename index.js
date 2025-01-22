@@ -334,6 +334,7 @@ class TodoistIntegration {
     try {
       const tasks = await this.fetchTasks();
       const container = document.getElementById("todoist-container");
+      console.log(tasks);
 
       container.innerHTML = `
                 <div class="tasks-header">
@@ -393,10 +394,10 @@ class TodoistIntegration {
                         <div class="task-option">
                             <label for="task-priority">Priority:</label>
                             <select id="task-priority" class="add-task-input">
-                                <option value="4">P4 (Natural)</option>
-                                <option value="3">P3 (Medium)</option>
-                                <option value="2">P2 (High)</option>
-                                <option value="1">P1 (Urgent)</option>
+                                <option value="1">P4 (Natural)</option>
+                                <option value="2">P3 (Medium)</option>
+                                <option value="3">P2 (High)</option>
+                                <option value="4">P1 (Urgent)</option>
                             </select>
                         </div>
                     </div>
@@ -418,7 +419,7 @@ class TodoistIntegration {
           await this.addTask(content, dueDate, priority);
           input.value = "";
           dueInput.value = "";
-          priorityInput.value = "4";
+          priorityInput.value = "1";
           await this.loadTasks(); // Reload tasks
         } catch (error) {
           console.error("Failed to add task:", error);
