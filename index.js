@@ -665,3 +665,203 @@ locationForm.addEventListener("submit", (e) => {
   locationModal.style.display = "none";
   locationForm.reset();
 });
+
+// Search bar
+
+class SearchBar {
+  constructor() {
+    this.form = document.getElementById("searchForm");
+    this.input = document.getElementById("searchInput");
+    this.suggestionsContainer = document.getElementById("suggestionsContainer");
+    this.selectedIndex = -1;
+    this.suggestions = [];
+
+    this.initializeEventListeners();
+    this.loadUrlHistory();
+    this.input.focus();
+  }
+
+  initializeEventListeners() {
+    this.form.addEventListener("submit", (e) => this.handleSubmit(e));
+    this.input.addEventListener("input", () => this.handleInput());
+    this.input.addEventListener("focus", () => this.showSuggestions());
+    this.input.addEventListener("keydown", (e) => this.handleKeydown(e));
+
+    document.addEventListener("click", (e) => {
+      if (!this.form.contains(e.target)) {
+        this.hideSuggestions();
+      }
+    });
+  }
+
+  loadUrlHistory() {
+    try {
+      this.urlHistory = JSON.parse(localStorage.getItem("urlHistory")) || [];
+    } catch {
+      this.urlHistory = [];
+    }
+  }
+
+  saveUrlHistory() {
+    localStorage.setItem("urlHistory", JSON.stringify(this.urlHistory));
+  }
+
+  addToHistory(url) {
+    // Remove the URL if it already exists
+    this.urlHistory = this.urlHistory.filter((item) => item !== url);
+    // Add to the beginning of the array
+    this.urlHistory.unshift(url);
+    // Keep only the last 10 URLs
+    this.urlHistory = this.urlHistory.slice(0, 10);
+    this.saveUrlHistory();
+  }
+
+  isValidUrl(string) {
+    // First, check if it's a complete URL
+    try {
+      const url = new URL(string);
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch {
+      // If not a complete URL, check if it matches a domain pattern
+      const domainPattern =
+        /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+
+      // Split on first slash to separate domain and path
+      const potentialDomain = string.split("/")[0];
+
+      // Must have at least one dot and match domain pattern
+      return (
+        potentialDomain.includes(".") && domainPattern.test(potentialDomain)
+      );
+    }
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+    const query = this.input.value.trim();
+    this.navigateToInput(query);
+  }
+
+  navigateToInput(query) {
+    if (this.isValidUrl(query)) {
+      const url = query.startsWith("http") ? query : `https://${query}`;
+      this.addToHistory(url);
+      window.location.href = url;
+    } else {
+      window.location.href = `https://www.google.com/search?q=${encodeURIComponent(
+        query
+      )}`;
+    }
+  }
+
+  handleInput() {
+    const query = this.input.value.trim().toLowerCase();
+
+    if (query) {
+      // Filter URL history for matching items
+      this.suggestions = this.urlHistory.filter((url) =>
+        url.toLowerCase().includes(query)
+      );
+      this.renderSuggestions();
+    } else {
+      this.suggestions = [];
+      this.hideSuggestions();
+    }
+
+    this.selectedIndex = -1;
+  }
+
+  handleKeydown(e) {
+    if (!this.suggestions.length) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        this.selectedIndex = Math.min(
+          this.selectedIndex + 1,
+          this.suggestions.length - 1
+        );
+        this.updateSelection();
+        break;
+
+      case "ArrowUp":
+        e.preventDefault();
+        this.selectedIndex = Math.max(this.selectedIndex - 1, -1);
+        this.updateSelection();
+        break;
+
+      case "Enter":
+        if (this.selectedIndex >= 0) {
+          e.preventDefault();
+          const selectedUrl = this.suggestions[this.selectedIndex];
+          this.navigateToInput(selectedUrl);
+        }
+        break;
+
+      case "Escape":
+        this.hideSuggestions();
+        break;
+    }
+  }
+
+  updateSelection() {
+    const items =
+      this.suggestionsContainer.querySelectorAll(".suggestion-item");
+    items.forEach((item, index) => {
+      item.classList.toggle("selected", index === this.selectedIndex);
+    });
+
+    if (this.selectedIndex >= 0) {
+      this.input.value = this.suggestions[this.selectedIndex];
+    }
+  }
+
+  renderSuggestions() {
+    this.suggestionsContainer.innerHTML = "";
+
+    this.suggestions.forEach((suggestion, index) => {
+      const itemEl = document.createElement("div");
+      itemEl.className = "suggestion-item";
+      if (index === this.selectedIndex) {
+        itemEl.classList.add("selected");
+      }
+
+      const icon = document.createElement("span");
+      icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+          </svg>`;
+      itemEl.appendChild(icon);
+
+      const text = document.createElement("span");
+      text.textContent = suggestion;
+      itemEl.appendChild(text);
+
+      itemEl.addEventListener("click", () => {
+        this.navigateToInput(suggestion);
+      });
+
+      itemEl.addEventListener("mouseenter", () => {
+        this.selectedIndex = index;
+        this.updateSelection();
+      });
+
+      this.suggestionsContainer.appendChild(itemEl);
+    });
+
+    this.showSuggestions();
+  }
+
+  showSuggestions() {
+    if (this.suggestions.length > 0) {
+      this.suggestionsContainer.classList.add("active");
+    }
+  }
+
+  hideSuggestions() {
+    this.suggestionsContainer.classList.remove("active");
+    this.selectedIndex = -1;
+  }
+}
+
+// Initialize the search bar
+new SearchBar();
