@@ -30,10 +30,10 @@
             </button>
           </div>
           <div class="form-group">
-            <label for="lat">Lat</label>
-            <input type="text" id="lat" required placeholder="Latitude" />
-            <label for="lat" style="margin-top: 0.5rem">Lon</label>
-            <input type="text" id="lon" required placeholder="Longitude" />
+            <label for="lat">Latitude</label>
+            <input type="text" id="lat" required placeholder="86.432" />
+            <label for="lat" style="margin-top: 0.5rem">Longitude</label>
+            <input type="text" id="lon" required placeholder="24.532" />
           </div>
           <div class="modal-buttons">
             <button
@@ -164,7 +164,9 @@
               placeholder="Add a goal..."
               required
             />
-            <button id="add-goal-button" class="add-goal-button">Add</button>
+            <button id="add-goal-button" class="button button-primary">
+              Add
+            </button>
           </div>
         </div>
       </div>
@@ -188,6 +190,7 @@
                 display: block;
                 margin-top: 0.5rem;
                 color: var(--text-secondary);
+                grid-column: span 4;
               "
             >
               Find your API token in Todoist Settings > Integrations

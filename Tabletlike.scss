@@ -1,10 +1,10 @@
 :root {
-  --primary-color: #ffdb58;
-  --text-primary: #000;
+  --primary-color: #dd3418;
+  --text-primary: #222;
   --text-secondary: #5f6368;
-  --background: #fff2e8;
+  --background: #f8f8f8;
   --card-background: #ffffff;
-  --danger: #ff6b6b;
+  --danger: #fa5d29;
 }
 
 * {
@@ -14,8 +14,8 @@
 }
 
 body {
-  font-family: Josefin Sans, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: Bookerly, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, sans-serif;
   font-size: max(16px, 0.1em + 0.8vw);
   background-color: var(--background);
   min-height: 100vh;
@@ -25,7 +25,7 @@ body {
 h1,
 h2,
 h3 {
-  font-family: Lexend Deca, Josefin Sans, system-ui, -apple-system,
+  font-family: Superclarendon, Bookerly, system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
     "Open Sans", "Helvetica Neue", sans-serif;
   text-transform: uppercase;
@@ -33,23 +33,15 @@ h3 {
 }
 
 input {
-  font-family: Josefin Sans, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  padding: 0.5rem 0.75rem;
-  color: var(--text-primary);
-  font-weight: 500;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  border: 2px solid var(--text-primary);
-  border-radius: 5px;
-  background-color: #fff;
-  height: 2.5rem;
+  font-family: Bookerly, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: transparent;
+  font-size: 1rem;
 }
 
 input:focus-visible {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000, 0 0 #0000;
+  outline: none;
+  border: 1px solid var(--primary-color);
 }
 
 .container {
@@ -82,23 +74,16 @@ input:focus-visible {
   flex-direction: column;
   align-items: center;
   text-decoration: none;
-  border: 2px solid #000;
-  border-radius: 5px;
-  box-shadow: 4px 4px 0 0 #000;
-  padding: 0.5rem;
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 0.15s;
+  transition: transform 0.2s ease;
 
   &:hover {
-    box-shadow: 0 0 #000;
-    transform: translate(4px, 4px) rotate(0) skewX(0) skewY(0) scaleX(1)
-      scaleY(1);
+    transform: scale(1.1);
   }
 
   img {
     width: 26px;
     height: 26px;
+    margin-bottom: 0.5rem;
   }
 
   span {
@@ -116,45 +101,19 @@ input:focus-visible {
   align-items: center;
   background: none;
   border: 2px solid var(--text-primary);
-  border-radius: 5px;
-  box-shadow: 4px 4px 0 0 #000;
   padding: 0.5rem 1rem;
   cursor: pointer;
-  color: var(--text-primary);
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 0.15s;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
 }
 
 .add-site-button:hover {
-  box-shadow: 0 0 #000;
-  transform: translate(4px, 4px) rotate(0) skewX(0) skewY(0) scaleX(1) scaleY(1);
+  color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .quick-link {
   position: relative;
-}
-
-.quick-link::after {
-  --tooltipScale: 0;
-
-  content: attr(data-url);
-  position: absolute;
-  bottom: -3.45rem;
-  background-color: var(--primary-color);
-  border: 2px solid var(--text-primary);
-  border-radius: 5px;
-  transform: scale(var(--tooltipScale));
-  transform-origin: top center;
-  transition: 0.5s transform;
-  text-transform: none;
-  font-size: 0.9rem;
-  color: var(--text-primary);
-  padding: 0.4rem;
-}
-
-.quick-link:hover::after {
-  --tooltipScale: 1;
 }
 
 .remove-site {
@@ -185,7 +144,7 @@ input:focus-visible {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.5);
   display: none;
   justify-content: center;
   align-items: center;
@@ -194,12 +153,10 @@ input:focus-visible {
 
 .modal {
   background: var(--background);
-  padding: 1.5rem;
-  border: 2px solid var(--text-primary);
-  border-radius: 5px;
+  padding: 2rem;
+  border: 1px solid var(--text-primary);
   width: 90%;
   max-width: 500px;
-  box-shadow: 5px 6px 0 0 #000;
 }
 
 .modal h2 {
@@ -208,24 +165,18 @@ input:focus-visible {
 
 .form-group {
   margin-bottom: 1rem;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-  align-items: center;
 }
 
 .form-group label {
   display: block;
+  margin-bottom: 0.5rem;
   color: var(--text-primary);
 }
 
 .form-group input {
   width: 100%;
-  grid-column: span 3 / span 3;
-}
-
-#auto-loc-button {
-  grid-column: span 4;
+  padding: 0.5rem;
+  border: 1px solid var(--text-secondary);
 }
 
 .modal-buttons {
@@ -238,33 +189,24 @@ input:focus-visible {
 .button {
   padding: 0.5rem 1rem;
   border: none;
-  color: var(--text-primary);
   cursor: pointer;
   transition: background-color 0.2s ease;
   font-size: 1rem;
-  border-radius: 5px;
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 0.15s;
-  box-shadow: 5px 6px 0 0 #000;
-  border: 2px solid var(--text-primary);
-  font-weight: 500;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  height: 2.5rem;
 }
 
 .button-primary {
   background: var(--primary-color);
+  color: white;
 }
 
 .button-secondary {
-  background: var(--background);
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--text-secondary);
 }
 
 .button:hover {
-  box-shadow: 0 0 #000;
-  transform: translate(5px, 6px) rotate(0) skewX(0) skewY(0) scaleX(1) scaleY(1);
+  opacity: 0.9;
 }
 
 /* Clock Section */
@@ -277,9 +219,7 @@ input:focus-visible {
 }
 
 .clock {
-  font-family: Josefin Sans, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: JetBrainsMono Nerd Font, "Courier New", Courier, monospace;
   font-size: 4rem;
   font-weight: bold;
   color: var(--text-primary);
@@ -352,14 +292,10 @@ input:focus-visible {
 }
 
 /* Todoist Card Styles */
-.tasks-section,
-.goals-section {
-  box-shadow: 5px 6px 0 0 #000;
-  color: var(--text-primary);
-  border: 2px solid var(--text-primary);
+.tasks-section {
+  border: 1px solid var(--text-primary);
   margin: 2rem auto;
   max-width: 600px;
-  border-radius: 5px;
   padding: 1.5rem;
 }
 
@@ -457,15 +393,8 @@ input:focus-visible {
 .add-task-input,
 .add-goal-input {
   flex-grow: 1;
-  padding: 0.5rem 0.75rem;
-  color: var(--text-primary);
-  font-weight: 500;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  border: 2px solid var(--text-primary);
-  border-radius: 5px;
-  background-color: #fff;
-  height: 2.5rem;
+  padding: 0.5rem;
+  border: 1px solid var(--text-secondary);
 }
 
 .add-task-options {
@@ -481,17 +410,12 @@ input:focus-visible {
 
 .task-option select,
 .task-option input {
-  font-family: Josefin Sans, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  padding: 0.5rem 0.75rem;
-  color: var(--text-primary);
-  font-weight: 500;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  border: 2px solid var(--text-primary);
-  border-radius: 5px;
-  background-color: #fff;
-  height: 2.5rem;
+  font-family: Bookerly, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, sans-serif;
+  padding: 0.5rem;
+  background: transparent;
+  border: 1px solid var(--text-secondary);
+  font-size: 0.95rem;
 }
 
 .add-task-button,
@@ -528,6 +452,22 @@ input:focus-visible {
 .todoist-setup {
   text-align: center;
   padding: 2rem;
+}
+
+.setup-button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.goals-section {
+  border: 1px solid var(--text-primary);
+  margin: 2rem auto;
+  max-width: 600px;
+  padding: 1.5rem;
 }
 
 .goal {
@@ -612,18 +552,10 @@ input:focus-visible {
   border: 2px solid var(--text-primary);
   outline: none;
   transition: border-color 0.2s;
-  color: var(--text-primary);
-  font-weight: 500;
-  border: 2px solid var(--text-primary);
-  border-radius: 5px;
-  background-color: #fff;
-  height: unset;
 }
 
-.search-input:focus-visible {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000, 0 0 #0000;
+.search-input:focus {
+  border: 2px solid var(--primary-color);
 }
 
 .search-button {

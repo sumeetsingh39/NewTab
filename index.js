@@ -75,11 +75,11 @@ function loadSites() {
   sites.forEach((site) => {
     const link = document.createElement("a");
     link.href = site.url;
+    link.setAttribute("data-url", site.url);
     link.className = "quick-link";
     link.innerHTML = `
             <button class="remove-site" data-url="${site.url}">×</button>
             <img src="${getFavicon(site.url)}" alt="${site.name}">
-            <span>${site.name}</span>
         `;
     quickLinksContainer.appendChild(link);
   });
@@ -218,7 +218,7 @@ class TodoistIntegration {
                     <p style="margin: 1rem 0;">
                         Connect your Todoist account to see and manage your tasks.
                     </p>
-                    <button id="setup-todoist" class="setup-button">
+                    <button id="setup-todoist" class="setup-button button button-primary">
                         Connect Todoist
                     </button>
                 </div>
@@ -381,7 +381,7 @@ class TodoistIntegration {
                                class="add-task-input"
                                placeholder="Add a task..."
                                required>
-                        <button type="submit" class="add-task-button">Add</button>
+                        <button type="submit" class="button button-primary">Add</button>
                     </div>
                     <div class="add-task-options">
                         <div class="task-option">
@@ -434,7 +434,7 @@ class TodoistIntegration {
                     <p style="margin: 1rem 0;">
                         Failed to load your tasks. Please check your API token.
                     </p>
-                    <button id="setup-todoist" class="setup-button">
+                    <button id="setup-todoist" class="button button-primary">
                         Reconnect Todoist
                     </button>
                 </div>
