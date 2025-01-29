@@ -154,6 +154,7 @@ input:focus-visible {
   font-size: 0.9rem;
   color: var(--text-primary);
   padding: 0.4rem;
+  word-break: keep-all;
 }
 
 .quick-link:hover::after {
