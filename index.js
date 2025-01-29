@@ -5,6 +5,8 @@ const defaultSites = [
   { name: "YouTube", url: "https://www.youtube.com" },
   { name: "Twitter", url: "https://twitter.com" },
   { name: "Reddit", url: "https://www.reddit.com" },
+  { name: "PDM", url: "https://pdm.pega.com" },
+  { name: "Claude", url: "https://claude.ai" },
 ];
 
 function saveGoals(goals) {
@@ -60,6 +62,18 @@ function getFavicon(url) {
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
 }
 
+function getImageNameFromUrl(url) {
+  try {
+    const urlObj = new URL(url);
+    let hostname = urlObj.hostname.replace("www.", "");
+    let siteName = hostname.split(".")[0];
+    return `./assets/${siteName.toLowerCase()}.png`;
+  } catch (error) {
+    console.error("Invalid URL:", error);
+    return "./assets/default.png";
+  }
+}
+
 function loadSites() {
   const sites =
     JSON.parse(localStorage.getItem("favorite-sites")) || defaultSites;
@@ -75,12 +89,24 @@ function loadSites() {
   sites.forEach((site) => {
     const link = document.createElement("a");
     link.href = site.url;
-    link.setAttribute("data-url", site.url);
+    link.setAttribute("data-url", site.name);
     link.className = "quick-link";
-    link.innerHTML = `
-            <button class="remove-site" data-url="${site.url}">×</button>
-            <img src="${getFavicon(site.url)}" alt="${site.name}">
-        `;
+    // link.innerHTML = `
+    //         <img src="${getFavicon(site.url)}" alt="${site.name}">
+    //     `;
+    const button = document.createElement("button");
+    button.setAttribute("data-url", site.url);
+    button.classList.add("remove-site");
+    button.innerHTML = `x`;
+
+    const img = document.createElement("img");
+    img.src = getImageNameFromUrl(site.url);
+    img.onerror = function () {
+      this.src = "./assets/default.png";
+    };
+
+    link.appendChild(button);
+    link.appendChild(img);
     quickLinksContainer.appendChild(link);
   });
 
@@ -339,7 +365,7 @@ class TodoistIntegration {
       container.innerHTML = `
                 <div class="tasks-header">
                     <h2>
-                        <img src="https://www.google.com/s2/favicons?domain=todoist.com&sz=32"
+                        <img src=${getImageNameFromUrl("https://todoist.com")}
                              alt="Todoist"
                              style="width: 24px; height: 24px;">
                         Inbox
@@ -559,7 +585,7 @@ async function loadWeather() {
     }
 
     const html = `
-        <span id="edit-location" class="edit"><svg fill="#fff" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 528.899 528.899" xml:space="preserve">
+        <span id="edit-location" class="edit"><svg fill="#000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 528.899 528.899" xml:space="preserve">
 <g>
 	<path d="M328.883,89.125l107.59,107.589l-272.34,272.34L56.604,361.465L328.883,89.125z M518.113,63.177l-47.981-47.981   c-18.543-18.543-48.653-18.543-67.259,0l-45.961,45.961l107.59,107.59l53.611-53.611   C532.495,100.753,532.495,77.559,518.113,63.177z M0.3,512.69c-1.958,8.812,5.998,16.708,14.811,14.565l119.891-29.069   L27.473,390.597L0.3,512.69z"/>
 </g>

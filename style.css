@@ -2,7 +2,7 @@
 :root {
   --primary-color: #ffdb58;
   --text-primary: #000;
-  --text-secondary: #5f6368;
+  --text-secondary: #000;
   --background: #fff2e8;
   --card-background: #ffffff;
   --danger: #ff6b6b;
@@ -130,13 +130,15 @@ input:focus-visible {
   --tooltipScale: 0;
   content: attr(data-url);
   position: absolute;
-  bottom: -3.45rem;
+  bottom: -2.45rem;
   background-color: var(--primary-color);
   border: 2px solid var(--text-primary);
   border-radius: 5px;
   transform: scale(var(--tooltipScale));
   transform-origin: top center;
-  transition: 0.5s transform;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.15s;
   text-transform: none;
   font-size: 0.9rem;
   color: var(--text-primary);
@@ -152,8 +154,8 @@ input:focus-visible {
   top: -8px;
   right: -8px;
   background: var(--danger);
-  color: white;
-  border: none;
+  color: var(--text-primary);
+  border: 2px solid var(--text-primary);
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -163,6 +165,7 @@ input:focus-visible {
   justify-content: center;
   padding: 0;
   line-height: 1;
+  font-size: 0.875rem;
 }
 
 .quick-link:hover .remove-site {
@@ -264,6 +267,12 @@ input:focus-visible {
   align-items: center;
   justify-content: center;
   margin: 5vh auto;
+  background: #fff;
+  width: 450px;
+  padding: 1.5rem 0.75rem;
+  border: 2px solid #000;
+  border-radius: 5px;
+  box-shadow: 5px 6px 0 0 #000;
 }
 
 .clock {
@@ -380,7 +389,7 @@ input:focus-visible {
   margin-right: 1rem;
   width: 18px;
   height: 18px;
-  border: 2px solid var(--text-secondary);
+  border: 2px solid var(--text-primary);
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -391,12 +400,11 @@ input:focus-visible {
 
 .task-checkbox.completed {
   background: var(--primary-color);
-  border-color: var(--primary-color);
 }
 
 .task-checkbox.completed::after {
   content: "✓";
-  color: white;
+  color: var(--text-primary);
   font-size: 12px;
 }
 
@@ -413,7 +421,7 @@ input:focus-visible {
 
 .task-due {
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   margin-left: 1rem;
 }
 
@@ -486,19 +494,19 @@ input:focus-visible {
 }
 
 .priority-p4 {
-  color: #dd3418;
+  color: #ff6b6b;
 }
 
 .priority-p3 {
-  color: #ff9667;
+  color: #fd9745;
 }
 
 .priority-p2 {
-  color: #10387b;
+  color: #8ae;
 }
 
 .priority-p1 {
-  color: #808080;
+  color: #000;
 }
 
 .add-task-button:hover,
@@ -521,8 +529,9 @@ input:focus-visible {
 }
 .goal .remove-goal {
   background-color: var(--danger);
-  color: #fff;
-  border: none;
+  color: #000;
+  border: 2px solid var(--text-primary);
+  font-size: 0.875rem;
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -531,15 +540,19 @@ input:focus-visible {
 
 #quotes-section {
   margin-bottom: 2rem;
-  color: rgba(0, 0, 0, 0.6);
+  color: rgb(0, 0, 0);
   text-align: center;
 }
 
 .weather-section {
-  margin: 1rem 0;
+  margin: 2rem auto;
   padding: 0.5rem;
-  background-color: var(--text-primary);
-  color: var(--background);
+  background-color: var(--primary-color);
+  color: var(--text-primary);
+  border: 2px solid #000;
+  border-radius: 5px;
+  width: -moz-fit-content;
+  width: fit-content;
 }
 .weather-section #weather-container {
   display: flex;
@@ -563,6 +576,7 @@ input:focus-visible {
 }
 .weather-section .temperature img {
   width: 1rem;
+  filter: brightness(0%) contrast(100%);
 }
 
 .search-container {
@@ -635,7 +649,8 @@ input:focus-visible {
   overflow-y: auto;
   z-index: 1000;
   max-width: 600px;
-  border: 1px solid var(--text-primary);
+  border: 2px solid var(--text-primary);
+  border-radius: 5px;
 }
 
 .suggestions-container.active {
@@ -648,14 +663,19 @@ input:focus-visible {
   display: flex;
   align-items: center;
   gap: 12px;
+  border-bottom: 2px solid var(--text-primary);
+}
+
+.suggestion-item:last-child {
+  border-bottom: unset;
 }
 
 .suggestion-item.selected {
-  background: #fceae7;
+  background: var(--primary-color);
 }
 
 .suggestion-item:hover {
-  background: #f5f5f5;
+  background: var(--primary-color);
 }
 
 .suggestion-item svg {
