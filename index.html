@@ -1,63 +1,274 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>New Tab</title>
+
+    <!-- Preload critical assets -->
+    <link rel="preload" href="style.css" as="style" />
+
+    <!-- Font preloading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Critical CSS -->
+    <style>
+      :root {
+        --primary-color: #7c4dff;
+        --primary-color-hover: #9669ff;
+        --text-primary: #e4e4e4;
+        --text-secondary: #a0a0a0;
+        --background: #121212;
+        --card-background: #1e1e1e;
+        --surface-1: #242424;
+        --surface-2: #2a2a2a;
+        --surface-3: #323232;
+        --danger: #ff4757;
+        --success: #2ed573;
+        --border-radius: 8px;
+      }
+
+      /* Loading screen styles */
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--background);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+      }
+
+      .loader {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .loader-circle {
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--surface-3);
+        border-top: 3px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loader-text {
+        color: var(--text-primary);
+        font-size: 0.9rem;
+        letter-spacing: 0.1rem;
+      }
+
+      /* Hide content until loaded */
+      body:not(.loaded) > *:not(#loading-screen) {
+        opacity: 0;
+      }
+
+      body.loaded > * {
+        opacity: 1;
+        transition: opacity 0.3s ease-in;
+      }
+
+      body.loaded #loading-screen {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      /* Basic resets */
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--background);
+        color: var(--text-primary);
+        min-height: 100vh;
+        font-family: "JetBrains Mono", monospace, sans-serif; /* Fallback chain */
+      }
+    </style>
+
+    <!-- Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&family=Overpass:ital,wght@0,100..900;1,100..900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css" />
+
+    <!-- Deferred CSS loading -->
+    <link
+      rel="stylesheet"
+      href="style.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript><link rel="stylesheet" href="style.css" /></noscript>
   </head>
   <body>
-    <div id="add-weather-location-modal" class="modal-overlay">
-      <div class="modal">
-        <h2>Add New Location</h2>
-        <form id="add-location-form">
-          <div class="form-group">
-            <label for="location-name">Location Name</label>
-            <input
-              type="text"
-              id="location-name"
-              required
-              placeholder="Patna..."
-            />
-          </div>
-          <div class="form-group">
-            <button
-              id="auto-loc-button"
-              type="button"
-              class="button button-secondary"
-            >
-              Fill Lat and Lon from current location
-            </button>
-          </div>
-          <div class="form-group">
-            <label for="lat">Latitude</label>
-            <input type="text" id="lat" required placeholder="86.432" />
-            <label for="lat" style="margin-top: 0.5rem">Longitude</label>
-            <input type="text" id="lon" required placeholder="24.532" />
-          </div>
-          <div class="modal-buttons">
-            <button
-              type="button"
-              class="button button-secondary"
-              id="cancel-add-location"
-            >
-              Cancel
-            </button>
-            <button type="submit" class="button button-primary">
-              Add Location
-            </button>
-          </div>
-        </form>
+    <nav class="main-nav">
+      <div class="nav-container">
+        <div class="site-title">Welcome Sumeet</div>
+        <div class="nav-weather" id="nav-weather"></div>
+      </div>
+    </nav>
+    <!-- Loading screen -->
+    <div id="loading-screen">
+      <div class="loader">
+        <div class="loader-circle"></div>
+        <div class="loader-text">Loading...</div>
       </div>
     </div>
 
-    <!-- Add Site Modal -->
+    <!-- Theme Toggle -->
+    <button
+      id="theme-toggle"
+      class="theme-toggle"
+      aria-label="Toggle dark/light mode"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+    </button>
+
+    <!-- Main dashboard layout -->
+    <div class="dashboard">
+      <!-- Top Section: Search & Weather -->
+      <section class="dashboard-section top-section">
+        <div class="search-container">
+          <form class="search-form" id="searchForm">
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Search Google or enter URL"
+              id="searchInput"
+              autocomplete="off"
+            />
+            <button type="submit" class="search-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </button>
+          </form>
+          <div class="suggestions-container" id="suggestionsContainer"></div>
+        </div>
+
+        <div class="date-time-weather">
+          <div class="clock-section">
+            <div id="clock" class="clock"></div>
+            <div id="date" class="date"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Middle Section: Quick Links -->
+      <section class="dashboard-section">
+        <div class="quick-links-container">
+          <div id="quick-links" class="quick-links">
+            <button id="add-site-btn" class="add-site-button">
+              <span>+</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quotes Section -->
+      <!-- <section class="dashboard-section">
+        <div id="quotes-section" class="quotes-container"></div>
+      </section> -->
+
+      <!-- Bottom Section: Tasks & Goals -->
+      <section class="dashboard-section tasks-goals-section">
+        <div class="container tasks-goals">
+          <div class="tasks-section">
+            <div id="todoist-container">
+              <!-- Content will be loaded dynamically -->
+            </div>
+          </div>
+
+          <div class="goals-section">
+            <div class="tasks-header">
+              <h2>
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 2L19.17 19.17L12 15.83L4.83 19.17L12 2Z"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                Goals
+              </h2>
+            </div>
+            <div class="goals-content">
+              <div id="goals">
+                <!-- Goals filled here -->
+              </div>
+              <div class="add-goal-row">
+                <input
+                  type="text"
+                  class="add-goal-input"
+                  id="add-goal-input"
+                  placeholder="Add a goal..."
+                  required
+                />
+                <button id="add-goal-button" class="button button-primary">
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Modals -->
     <div id="add-site-modal" class="modal-overlay">
       <div class="modal">
         <h2>Add New Site</h2>
@@ -68,7 +279,7 @@
               type="text"
               id="site-name"
               required
-              placeholder="e.g., Google"
+              placeholder="e.g., GitHub"
             />
           </div>
           <div class="form-group">
@@ -77,7 +288,7 @@
               type="url"
               id="site-url"
               required
-              placeholder="e.g., https://www.google.com"
+              placeholder="e.g., https://github.com"
             />
           </div>
           <div class="modal-buttons">
@@ -96,89 +307,50 @@
       </div>
     </div>
 
-    <!-- Quick Links Section -->
-    <div class="container">
-      <div id="quick-links" class="quick-links">
-        <button id="add-site-btn" class="add-site-button">
-          <span style="font-size: 24px">+</span>
-        </button>
-      </div>
-    </div>
-    <div class="weather-section">
-      <div id="weather-container"></div>
-    </div>
-    <div class="search-container">
-      <form class="search-form" id="searchForm">
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Search Google or enter URL"
-          id="searchInput"
-          autocomplete="off"
-        />
-        <button type="submit" class="search-button">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-        </button>
-      </form>
-      <div class="suggestions-container" id="suggestionsContainer"></div>
-    </div>
-    <!-- Clock Section -->
-    <div class="clock-section">
-      <div id="clock" class="clock"></div>
-      <div id="date" class="date"></div>
-    </div>
-    <div class="quotes container">
-      <!-- <div id="quotes-section"></div>
-    </div> -->
-    <div class="container tasks-goals">
-      <div class="tasks-section">
-        <div id="todoist-container">
-          <!-- Content will be loaded dynamically -->
-        </div>
-      </div>
-      <div class="goals-section">
-        <div class="tasks-header">
-          <h2>
-            <img
-              src="./assets/goal.png"
-              alt="Goals"
-              style="width: 24px; height: 24px"
-            />Goals
-          </h2>
-        </div>
-        <div class="goals-content">
-          <div id="goals">
-            <!-- Goals filled here -->
-          </div>
-          <div class="add-goal-row">
+    <div id="add-weather-location-modal" class="modal-overlay">
+      <div class="modal">
+        <h2>Add New Location</h2>
+        <form id="add-location-form">
+          <div class="form-group">
+            <label for="location-name">Location Name</label>
             <input
               type="text"
-              class="add-goal-input"
-              id="add-goal-input"
-              placeholder="Add a goal..."
+              id="location-name"
               required
+              placeholder="e.g., San Francisco"
             />
-            <button id="add-goal-button" class="button button-primary">
-              Add
+          </div>
+          <div class="form-group">
+            <button
+              id="auto-loc-button"
+              type="button"
+              class="button button-secondary"
+            >
+              Use current location
             </button>
           </div>
-        </div>
+          <div class="form-group">
+            <label for="lat">Latitude</label>
+            <input type="text" id="lat" required placeholder="37.7749" />
+            <label for="lon">Longitude</label>
+            <input type="text" id="lon" required placeholder="-122.4194" />
+          </div>
+          <div class="modal-buttons">
+            <button
+              type="button"
+              class="button button-secondary"
+              id="cancel-add-location"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="button button-primary">
+              Add Location
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
-    <!-- Setup Token Modal -->
     <div id="setup-token-modal" class="modal-overlay">
       <div class="modal">
         <h2>Setup Todoist Integration</h2>
@@ -191,14 +363,7 @@
               required
               placeholder="Enter your Todoist API token"
             />
-            <small
-              style="
-                display: block;
-                margin-top: 0.5rem;
-                color: var(--text-secondary);
-                grid-column: span 4;
-              "
-            >
+            <small class="form-help">
               Find your API token in Todoist Settings > Integrations
             </small>
           </div>
@@ -218,6 +383,27 @@
       </div>
     </div>
 
-    <script src="index.js"></script>
+    <!-- Scripts -->
+    <script>
+      // Handle page loading
+      function markAsLoaded() {
+        document.body.classList.add("loaded");
+        setTimeout(() => {
+          const loadingScreen = document.getElementById("loading-screen");
+          if (loadingScreen && loadingScreen.parentNode) {
+            loadingScreen.parentNode.removeChild(loadingScreen);
+          }
+        }, 300);
+      }
+
+      if (document.readyState === "complete") {
+        markAsLoaded();
+      } else {
+        window.addEventListener("load", markAsLoaded);
+        setTimeout(markAsLoaded, 2000); // Fallback
+      }
+    </script>
+
+    <script src="index.js" defer></script>
   </body>
 </html>

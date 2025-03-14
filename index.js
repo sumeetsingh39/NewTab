@@ -1,3 +1,38 @@
+// Theme Management
+
+(function initializeTheme() {
+  // Check for saved theme preference or prefer-color-scheme
+  const savedTheme = localStorage.getItem("theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  // Set initial theme
+  if (savedTheme) {
+    document.documentElement.setAttribute("data-theme", savedTheme);
+  } else if (prefersDark) {
+    document.documentElement.setAttribute("data-theme", "dark");
+  } else {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+function initThemeToggle() {
+  const themeToggle = document.getElementById("theme-toggle");
+  if (!themeToggle) return;
+
+  themeToggle.addEventListener("click", () => {
+    // Get current theme
+    const currentTheme =
+      document.documentElement.getAttribute("data-theme") || "dark";
+    // Set new theme
+    const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+    // Apply the theme
+    document.documentElement.setAttribute("data-theme", newTheme);
+    localStorage.setItem("theme", newTheme);
+
+    console.log("Theme changed to:", newTheme); // For debugging
+  });
+}
+
 // Site Management
 const defaultSites = [
   { name: "Google", url: "https://www.google.com" },
@@ -13,6 +48,7 @@ function saveGoals(goals) {
   localStorage.setItem("goals", JSON.stringify(goals));
   loadGoals();
 }
+
 function removeGoal(pos) {
   const goals = JSON.parse(localStorage.getItem("goals")) || [];
   goals.splice(pos, 1);
@@ -22,40 +58,53 @@ function removeGoal(pos) {
 function loadGoals() {
   const goals = JSON.parse(localStorage.getItem("goals")) || [];
   const goalsContainer = document.getElementById("goals");
+  if (!goalsContainer) return;
 
   goalsContainer.innerHTML = "";
+
+  if (goals.length === 0) {
+    goalsContainer.innerHTML = `<div class="empty-state">No goals yet. Add one below!</div>`;
+    return;
+  }
 
   goals.forEach((goal, index) => {
     const g = document.createElement("div");
     g.className = "goal";
     g.innerHTML = `
-            <p>${goal}</p>
-            <button data-pos=${index} class="remove-goal">X</button>
-        `;
+      <p>${goal}</p>
+      <button data-pos=${index} class="remove-goal">×</button>
+    `;
     goalsContainer.appendChild(g);
   });
 }
 
-const addGoal = document.getElementById("add-goal-button");
+function initGoals() {
+  const addGoalBtn = document.getElementById("add-goal-button");
+  if (!addGoalBtn) return;
 
-addGoal.addEventListener("click", () => {
-  const goals = JSON.parse(localStorage.getItem("goals")) || [];
-  const newGoal = document.getElementById("add-goal-input").value;
+  addGoalBtn.addEventListener("click", () => {
+    const goals = JSON.parse(localStorage.getItem("goals")) || [];
+    const inputField = document.getElementById("add-goal-input");
+    if (!inputField) return;
 
-  if (newGoal) {
-    goals.push(newGoal);
-    saveGoals(goals);
-  }
-  document.getElementById("add-goal-input").value = "";
-});
-document.addEventListener("click", (e) => {
-  if (e.target.matches(".remove-goal")) {
-    e.preventDefault();
-    const goalPos = e.target.dataset.pos;
-    removeGoal(goalPos);
-  }
-});
-loadGoals();
+    const newGoal = inputField.value.trim();
+    if (newGoal) {
+      goals.push(newGoal);
+      saveGoals(goals);
+      inputField.value = "";
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    if (e.target.matches(".remove-goal")) {
+      e.preventDefault();
+      const goalPos = e.target.dataset.pos;
+      removeGoal(goalPos);
+    }
+  });
+
+  loadGoals();
+}
 
 function getFavicon(url) {
   const domain = new URL(url).hostname;
@@ -78,7 +127,10 @@ function loadSites() {
   const sites =
     JSON.parse(localStorage.getItem("favorite-sites")) || defaultSites;
   const quickLinksContainer = document.getElementById("quick-links");
+  if (!quickLinksContainer) return;
+
   const addButton = document.getElementById("add-site-btn");
+  if (!addButton) return;
 
   // Clear existing sites except the add button
   while (quickLinksContainer.firstChild) {
@@ -91,22 +143,25 @@ function loadSites() {
     link.href = site.url;
     link.setAttribute("data-url", site.name);
     link.className = "quick-link";
-    // link.innerHTML = `
-    //         <img src="${getFavicon(site.url)}" alt="${site.name}">
-    //     `;
+
     const button = document.createElement("button");
     button.setAttribute("data-url", site.url);
     button.classList.add("remove-site");
-    button.innerHTML = `x`;
+    button.innerHTML = `×`;
 
     const img = document.createElement("img");
     img.src = getImageNameFromUrl(site.url);
+    img.alt = site.name;
     img.onerror = function () {
       this.src = "./assets/default.png";
     };
 
+    const label = document.createElement("span");
+    label.textContent = site.name;
+
     link.appendChild(button);
     link.appendChild(img);
+    link.appendChild(label);
     quickLinksContainer.appendChild(link);
   });
 
@@ -129,54 +184,87 @@ function removeSite(url) {
 function addSite(name, url) {
   const sites =
     JSON.parse(localStorage.getItem("favorite-sites")) || defaultSites;
+
+  // Ensure URL has http or https
+  if (!/^https?:\/\//i.test(url)) {
+    url = "https://" + url;
+  }
+
+  // Check if site already exists
+  const siteExists = sites.some((site) => site.url === url);
+  if (siteExists) {
+    alert("This site already exists in your quick links.");
+    return;
+  }
+
   sites.push({ name, url });
   saveSites(sites);
 }
 
 // Modal Management
-const modal = document.getElementById("add-site-modal");
-const addSiteBtn = document.getElementById("add-site-btn");
-const cancelBtn = document.getElementById("cancel-add-site");
-const addSiteForm = document.getElementById("add-site-form");
+function initModals() {
+  const siteModal = document.getElementById("add-site-modal");
+  const addSiteBtn = document.getElementById("add-site-btn");
+  const cancelSiteBtn = document.getElementById("cancel-add-site");
+  const addSiteForm = document.getElementById("add-site-form");
 
-addSiteBtn.addEventListener("click", () => {
-  modal.style.display = "flex";
-});
-
-cancelBtn.addEventListener("click", () => {
-  modal.style.display = "none";
-  addSiteForm.reset();
-});
-
-modal.addEventListener("click", (e) => {
-  if (e.target === modal) {
-    modal.style.display = "none";
-    addSiteForm.reset();
+  if (addSiteBtn && siteModal) {
+    addSiteBtn.addEventListener("click", () => {
+      siteModal.style.display = "flex";
+      siteModal.querySelector("input").focus();
+    });
   }
-});
 
-addSiteForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const name = document.getElementById("site-name").value;
-  const url = document.getElementById("site-url").value;
-  addSite(name, url);
-  modal.style.display = "none";
-  addSiteForm.reset();
-});
-
-document.addEventListener("click", (e) => {
-  if (e.target.matches(".remove-site")) {
-    e.preventDefault();
-    const url = e.target.dataset.url;
-    removeSite(url);
+  if (cancelSiteBtn && siteModal && addSiteForm) {
+    cancelSiteBtn.addEventListener("click", () => {
+      siteModal.style.display = "none";
+      addSiteForm.reset();
+    });
   }
-});
 
-// Initialize sites
-loadSites();
+  // Close modal when clicking overlay
+  document.querySelectorAll(".modal-overlay").forEach((modal) => {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.style.display = "none";
+        const form = modal.querySelector("form");
+        if (form) form.reset();
+      }
+    });
+  });
 
-// Update Clock and Date
+  if (addSiteForm) {
+    addSiteForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("site-name").value.trim();
+      const url = document.getElementById("site-url").value.trim();
+
+      if (!name || !url) return;
+
+      addSite(name, url);
+      siteModal.style.display = "none";
+      addSiteForm.reset();
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    if (e.target.matches(".remove-site")) {
+      e.preventDefault();
+      e.stopPropagation();
+      const url = e.target.dataset.url;
+      if (confirm("Are you sure you want to remove this site?")) {
+        removeSite(url);
+      }
+    }
+  });
+}
+
+// Clock and Date
 function updateTime() {
+  const clockElement = document.getElementById("clock");
+  const dateElement = document.getElementById("date");
+  if (!clockElement || !dateElement) return;
+
   const now = new Date();
   const timeString = now.toLocaleTimeString("en-US", {
     hour12: true,
@@ -191,64 +279,39 @@ function updateTime() {
     day: "numeric",
   });
 
-  document.getElementById("clock").textContent = timeString;
-  document.getElementById("date").textContent = dateString;
+  clockElement.textContent = timeString;
+  dateElement.textContent = dateString;
 }
 
-setInterval(updateTime, 1000);
-updateTime();
-
-// Fetch News
-// async function fetchNews() {
-//     try {
-//         const response = await fetch('https://newsapi.org/v2/top-headlines?sources=google-news-in&apiKey=2cc3de72906545f39d6f4214b72c3eb5');
-//         const data = await response.json();
-
-//         const newsContainer = document.getElementById('news-container');
-
-//         data.articles.slice(0, 6).forEach(article => {
-//             const card = document.createElement('div');
-//             card.className = 'news-card';
-
-//             card.innerHTML = `
-//                 <img src="${article.urlToImage || '/api/placeholder/400/200'}"
-//                      alt="${article.title}">
-//                 <h3>${article.title}</h3>
-//                 <p>${article.description || ''}</p>
-//                 <a href="${article.url}" target="_blank">Read more</a>
-//             `;
-
-//             newsContainer.appendChild(card);
-//         });
-//     } catch (error) {
-//         console.error('Error fetching news:', error);
-//     }
-// }
-
-// fetchNews();
+function initClock() {
+  updateTime();
+  setInterval(updateTime, 1000);
+}
 
 // Todoist Integration
 class TodoistIntegration {
   constructor() {
     this.apiToken = localStorage.getItem("todoist-token");
     this.baseUrl = "https://api.todoist.com/rest/v2";
+    this.container = document.getElementById("todoist-container");
+    if (!this.container) return;
   }
 
   async initialize() {
-    const container = document.getElementById("todoist-container");
+    if (!this.container) return;
 
     if (!this.apiToken) {
-      container.innerHTML = `
-                <div class="todoist-setup">
-                    <h2>Connect with Todoist</h2>
-                    <p style="margin: 1rem 0;">
-                        Connect your Todoist account to see and manage your tasks.
-                    </p>
-                    <button id="setup-todoist" class="setup-button button button-primary">
-                        Connect Todoist
-                    </button>
-                </div>
-            `;
+      this.container.innerHTML = `
+        <div class="todoist-setup">
+          <h2>Connect with Todoist</h2>
+          <p style="margin: 1rem 0;">
+            Connect your Todoist account to see and manage your tasks.
+          </p>
+          <button id="setup-todoist" class="button button-primary">
+            Connect Todoist
+          </button>
+        </div>
+      `;
       this.setupEventListeners();
       return;
     }
@@ -263,36 +326,53 @@ class TodoistIntegration {
     const cancelBtn = document.getElementById("cancel-setup");
 
     setupBtn?.addEventListener("click", () => {
-      modal.style.display = "flex";
+      if (modal) {
+        modal.style.display = "flex";
+        const input = modal.querySelector("input");
+        if (input) input.focus();
+      }
     });
 
     cancelBtn?.addEventListener("click", () => {
-      modal.style.display = "none";
-      form.reset();
+      if (modal) {
+        modal.style.display = "none";
+        if (form) form.reset();
+      }
     });
 
     form?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const token = document.getElementById("api-token").value;
+      const tokenInput = document.getElementById("api-token");
+      if (!tokenInput) return;
+
+      const token = tokenInput.value.trim();
+      if (!token) return;
+
       this.apiToken = token;
       localStorage.setItem("todoist-token", token);
-      modal.style.display = "none";
+
+      if (modal) modal.style.display = "none";
       await this.initialize();
     });
   }
 
   async fetchTasks() {
-    const response = await fetch(`${this.baseUrl}/tasks`, {
-      headers: {
-        Authorization: `Bearer ${this.apiToken}`,
-      },
-    });
+    try {
+      const response = await fetch(`${this.baseUrl}/tasks`, {
+        headers: {
+          Authorization: `Bearer ${this.apiToken}`,
+        },
+      });
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch tasks");
+      if (!response.ok) {
+        throw new Error("Failed to fetch tasks");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      throw error;
     }
-
-    return await response.json();
   }
 
   async addTask(content, dueDate, priority) {
@@ -335,8 +415,8 @@ class TodoistIntegration {
     if (taskItem) {
       const checkbox = taskItem.querySelector(".task-checkbox");
       const content = taskItem.querySelector(".task-content");
-      checkbox.classList.add("completed");
-      content.classList.add("completed");
+      if (checkbox) checkbox.classList.add("completed");
+      if (content) content.classList.add("completed");
     }
   }
 
@@ -359,193 +439,166 @@ class TodoistIntegration {
   async loadTasks() {
     try {
       const tasks = await this.fetchTasks();
-      const container = document.getElementById("todoist-container");
-      console.log(tasks);
+      if (!this.container) return;
 
-      container.innerHTML = `
-                <div class="tasks-header">
-                    <h2>
-                        <img src=${getImageNameFromUrl("https://todoist.com")}
-                             alt="Todoist"
-                             style="width: 24px; height: 24px;">
-                        Inbox
-                    </h2>
-                </div>
-                <ul class="tasks-list">
-                    ${tasks
-                      .map(
-                        (task) => `
-                        <li class="task-item" data-task-id="${task.id}">
-                            <div class="task-checkbox ${
-                              task.completed ? "completed" : ""
-                            }"
-                                 onclick="todoist.completeTask('${
-                                   task.id
-                                 }')"></div>
-                            <span class="task-content ${
-                              task.completed ? "completed" : ""
-                            } priority-p${task.priority}">
-                                ${task.content}
-                            </span>
-                            ${
-                              task.due
-                                ? `
-                                <span class="task-due">
-                                    ${this.formatDate(task.due.date)}
-                                </span>
-                            `
-                                : ""
-                            }
-                        </li>
-                    `
-                      )
-                      .join("")}
-                </ul>
-                <form class="add-task-form" id="add-task-form">
-                    <div class="add-task-row">
-                        <input type="text"
-                               class="add-task-input"
-                               placeholder="Add a task..."
-                               required>
-                        <button type="submit" class="button button-primary">Add</button>
-                    </div>
-                    <div class="add-task-options">
-                        <div class="task-option">
-                            <label for="task-due">Due:</label>
-                            <input type="text"
-                                   id="task-due"
-                                   placeholder="today, tomorrow, next Monday..."
-                                   class="add-task-input">
-                        </div>
-                        <div class="task-option">
-                            <label for="task-priority">Priority:</label>
-                            <select id="task-priority" class="add-task-input">
-                                <option value="1">P4 (Natural)</option>
-                                <option value="2">P3 (Medium)</option>
-                                <option value="3">P2 (High)</option>
-                                <option value="4">P1 (Urgent)</option>
-                            </select>
-                        </div>
-                    </div>
-                </form>
-            `;
+      this.container.innerHTML = `
+        <div class="tasks-header">
+          <h2>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6l3-3 3 3M3 6v13c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V6M3 6h18M16 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
+            </svg>
+            Inbox
+          </h2>
+        </div>
+        ${
+          tasks.length === 0
+            ? '<div class="empty-state">No tasks in your inbox</div>'
+            : ""
+        }
+        <ul class="tasks-list">
+          ${tasks
+            .map(
+              (task) => `
+            <li class="task-item" data-task-id="${task.id}">
+              <div class="task-checkbox ${task.completed ? "completed" : ""}"
+                   onclick="todoist.completeTask('${task.id}')"></div>
+              <span class="task-content ${
+                task.completed ? "completed" : ""
+              } priority-p${task.priority}">
+                ${task.content}
+              </span>
+              ${
+                task.due
+                  ? `<span class="task-due">${this.formatDate(
+                      task.due.date
+                    )}</span>`
+                  : ""
+              }
+            </li>
+          `
+            )
+            .join("")}
+        </ul>
+        <form class="add-task-form" id="add-task-form">
+          <div class="add-task-row">
+            <input type="text"
+                   class="add-task-input"
+                   placeholder="Add a task..."
+                   required>
+            <button type="submit" class="button button-primary">Add</button>
+          </div>
+          <div class="add-task-options">
+            <div class="task-option">
+              <label for="task-due">Due:</label>
+              <input type="text"
+                     id="task-due"
+                     placeholder="today, tomorrow..."
+                     class="add-task-input">
+            </div>
+            <div class="task-option">
+              <label for="task-priority">Priority:</label>
+              <select id="task-priority" class="add-task-input">
+                <option value="1">P4 (Natural)</option>
+                <option value="2">P3 (Medium)</option>
+                <option value="3">P2 (High)</option>
+                <option value="4">P1 (Urgent)</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      `;
 
       const addTaskForm = document.getElementById("add-task-form");
-      addTaskForm.addEventListener("submit", async (e) => {
+      addTaskForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
         const input = addTaskForm.querySelector(".add-task-input");
         const dueInput = document.getElementById("task-due");
         const priorityInput = document.getElementById("task-priority");
+        if (!input || !dueInput || !priorityInput) return;
 
-        const content = input.value;
-        const dueDate = dueInput.value;
+        const content = input.value.trim();
+        const dueDate = dueInput.value.trim();
         const priority = priorityInput.value;
+
+        if (!content) return;
 
         try {
           await this.addTask(content, dueDate, priority);
           input.value = "";
           dueInput.value = "";
           priorityInput.value = "1";
-          await this.loadTasks(); // Reload tasks
+          await this.loadTasks();
         } catch (error) {
           console.error("Failed to add task:", error);
+          alert("Failed to add task. Please try again.");
         }
       });
     } catch (error) {
       console.error("Failed to load tasks:", error);
-      const container = document.getElementById("todoist-container");
-      container.innerHTML = `
-                <div class="todoist-setup">
-                    <h2>Error Loading Tasks</h2>
-                    <p style="margin: 1rem 0;">
-                        Failed to load your tasks. Please check your API token.
-                    </p>
-                    <button id="setup-todoist" class="button button-primary">
-                        Reconnect Todoist
-                    </button>
-                </div>
-            `;
+      if (!this.container) return;
+
+      this.container.innerHTML = `
+        <div class="todoist-setup">
+          <h2>Error Loading Tasks</h2>
+          <p style="margin: 1rem 0;">
+            Failed to load your tasks. Please check your API token.
+          </p>
+          <button id="setup-todoist" class="button button-primary">
+            Reconnect Todoist
+          </button>
+        </div>
+      `;
       this.setupEventListeners();
     }
   }
 }
 
-// Initialize Todoist integration
-const todoist = new TodoistIntegration();
-todoist.initialize();
-
-// Quote Implementation
-// async function fetchQuote() {
-//   const response = await fetch("https://thequoteshub.com/api/");
-//   if (!response.ok) {
-//     throw new Error("Failed to fetch quote");
-//   }
-//   return await response.json();
-// }
-
-// async function loadQuote() {
-//   try {
-//     let quote;
-//     const today = new Date().toLocaleDateString();
-//     const storedData = localStorage.getItem("dailyQuote");
-
-//     if (storedData) {
-//       const { date, quoteData } = JSON.parse(storedData);
-
-//       if (date === today) {
-//         // Use stored quote if it's from today
-//         quote = quoteData;
-//         console.log("Quote loaded from storage");
-//       } else {
-//         // Fetch new quote if date has changed
-//         quote = await fetchQuote();
-//         localStorage.setItem(
-//           "dailyQuote",
-//           JSON.stringify({
-//             date: today,
-//             quoteData: quote,
-//           })
-//         );
-//         console.log("New quote fetched and stored");
-//       }
-//     } else {
-//       // First time fetching quote
-//       quote = await fetchQuote();
-//       localStorage.setItem(
-//         "dailyQuote",
-//         JSON.stringify({
-//           date: today,
-//           quoteData: quote,
-//         })
-//       );
-//       console.log("First quote fetched and stored");
-//     }
-
-//     const html = `
-//         <blockquote>&ldquo;${quote.text}&rdquo; <footer>&mdash; <cite>${quote.author}</cite></footer></blockquote>
-//       `;
-//     const quotesContainer = document.getElementById("quotes-section");
-//     quotesContainer.innerHTML = html;
-//   } catch (error) {
-//     console.log("Failed to load quote:", error);
-//   }
-// }
-
-// loadQuote();
-
-// Weather
-
+// Weather Integration
 async function fetchWeather(lat, lon) {
-  const response = await fetch(
-    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,wind_speed_10m,wind_direction_10m&timezone=auto`
-  );
-  if (!response.ok) {
-    throw new Error("Failed to fetch Weather");
+  try {
+    const response = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,wind_speed_10m,wind_direction_10m&timezone=auto`
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch Weather");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Weather API error:", error);
+    throw error;
   }
-  return await response.json();
 }
 
+async function addLocation(location, lat, lon) {
+  try {
+    const currentTime = new Date().getTime();
+    const weather = await fetchWeather(lat, lon);
+
+    localStorage.setItem(
+      "weather",
+      JSON.stringify({
+        timestamp: currentTime,
+        location: location,
+        lat: lat,
+        lon: lon,
+        weatherData: weather,
+      })
+    );
+
+    loadWeather();
+  } catch (error) {
+    console.error("Failed to add location:", error);
+    alert("Failed to get weather for this location. Please try again.");
+  }
+}
+
+// Update the loadWeather function
 async function loadWeather() {
+  const navWeatherContainer = document.getElementById("nav-weather");
+  if (!navWeatherContainer) return;
+
   try {
     let weather;
     const currentTime = new Date().getTime();
@@ -557,155 +610,245 @@ async function loadWeather() {
         JSON.parse(storedData);
 
       if (currentTime - timestamp < TWO_HOURS) {
-        // Use stored quote if it's from today
+        // Use stored weather if it's recent
         weather = weatherData;
         console.log("Weather loaded from storage");
       } else {
-        // Fetch new quote if date has changed
-        weather = await fetchWeather(lat, lon);
-        localStorage.setItem(
-          "weather",
-          JSON.stringify({
-            timestamp: currentTime,
-            location: location,
-            lat: lat,
-            lon: lon,
-            weatherData: weather,
-          })
-        );
-        console.log("New weather fetched and stored");
+        // Fetch new weather if data is stale
+        try {
+          weather = await fetchWeather(lat, lon);
+          localStorage.setItem(
+            "weather",
+            JSON.stringify({
+              timestamp: currentTime,
+              location: location,
+              lat: lat,
+              lon: lon,
+              weatherData: weather,
+            })
+          );
+          console.log("New weather fetched and stored");
+        } catch (error) {
+          console.error("Error updating weather:", error);
+          weather = weatherData; // Fallback to stale data
+        }
       }
-    } else {
+
+      let iconType = weather.current.is_day ? "day" : "night";
+      if (weather.current.precipitation > 0) {
+        iconType = "rain";
+      }
+
       const html = `
-                <button id="add-location" class="button button-primary">Add location</button>
-            `;
-      const weatherContainer = document.getElementById("weather-container");
-      weatherContainer.innerHTML = html;
+        <span id="edit-location" class="edit">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+          </svg>
+        </span>
+        <div class="location-name">${location}</div>
+        <div class="temperature">
+          <img alt='weather icon' src="./assets/${iconType}.png">
+          <span class="temperature-text">${weather.current.temperature_2m}${weather.current_units.temperature_2m}</span>
+        </div>
+        <div class="weather-details">
+          <span class="weather-details-value">${weather.current.relative_humidity_2m}${weather.current_units.relative_humidity_2m} humidity</span>
+        </div>
+      `;
+
+      navWeatherContainer.innerHTML = html;
+
+      // Add edit location functionality
+      const editLocation = document.getElementById("edit-location");
+      const locationModal = document.getElementById(
+        "add-weather-location-modal"
+      );
+      editLocation?.addEventListener("click", () => {
+        if (locationModal) locationModal.style.display = "flex";
+      });
+    } else {
+      // No weather data stored yet
+      const html = `
+        <button id="add-location" class="button button-primary">Add location</button>
+      `;
+      navWeatherContainer.innerHTML = html;
+
+      // Add button click handler
+      const addLocationButton = document.getElementById("add-location");
+      const locationModal = document.getElementById(
+        "add-weather-location-modal"
+      );
+      addLocationButton?.addEventListener("click", () => {
+        if (locationModal) locationModal.style.display = "flex";
+      });
+    }
+  } catch (error) {
+    console.error("Failed to load weather:", error);
+    navWeatherContainer.innerHTML = `
+      <div class="error-state">
+        <button id="add-location" class="button button-primary">Set location</button>
+      </div>
+    `;
+  }
+}
+
+function initWeather() {
+  loadWeather();
+
+  // Set up location modal events
+  const locationModal = document.getElementById("add-weather-location-modal");
+  const locationForm = document.getElementById("add-location-form");
+  const locationCancel = document.getElementById("cancel-add-location");
+  const autoLocButton = document.getElementById("auto-loc-button");
+
+  if (!locationModal || !locationForm || !locationCancel || !autoLocButton)
+    return;
+
+  function showPosition(position) {
+    const latInput = document.getElementById("lat");
+    const lonInput = document.getElementById("lon");
+    if (!latInput || !lonInput) return;
+
+    latInput.value = position.coords.latitude.toPrecision(6);
+    lonInput.value = position.coords.longitude.toPrecision(6);
+  }
+
+  autoLocButton.addEventListener("click", () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        showPosition,
+        (error) => {
+          console.error("Geolocation error:", error);
+          alert(
+            "Unable to get your location. Please enter coordinates manually."
+          );
+        },
+        { timeout: 10000 }
+      );
+    } else {
+      alert("Geolocation is not supported by your browser.");
+    }
+  });
+
+  locationCancel.addEventListener("click", () => {
+    locationModal.style.display = "none";
+    locationForm.reset();
+  });
+
+  locationModal.addEventListener("click", (e) => {
+    if (e.target === locationModal) {
+      locationModal.style.display = "none";
+      locationForm.reset();
+    }
+  });
+
+  locationForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nameInput = document.getElementById("location-name");
+    const latInput = document.getElementById("lat");
+    const lonInput = document.getElementById("lon");
+
+    if (!nameInput || !latInput || !lonInput) return;
+
+    const name = nameInput.value.trim();
+    const lat = latInput.value.trim();
+    const lon = lonInput.value.trim();
+
+    if (!name || !lat || !lon) {
+      alert("Please fill all fields");
       return;
     }
 
-    const html = `
-        <span id="edit-location" class="edit"><svg fill="#fff" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 528.899 528.899" xml:space="preserve">
-<g>
-	<path d="M328.883,89.125l107.59,107.589l-272.34,272.34L56.604,361.465L328.883,89.125z M518.113,63.177l-47.981-47.981   c-18.543-18.543-48.653-18.543-67.259,0l-45.961,45.961l107.59,107.59l53.611-53.611   C532.495,100.753,532.495,77.559,518.113,63.177z M0.3,512.69c-1.958,8.812,5.998,16.708,14.811,14.565l119.891-29.069   L27.473,390.597L0.3,512.69z"/>
-</g>
-
-</svg></span>
-          <div class="location-name">Harnaut</div>
-
-          <div class="temperature">
-            <img alt='image' src="${
-              weather.current.is_day ? "./assets/day.png" : "./assets/night.png"
-            }">
-            <span class="temperature-text">${weather.current.temperature_2m}${
-      weather.current_units.temperature_2m
-    }</span>
-          </div>
-          <div class="weather-details">
-          <span class="weather-details-label">Humidity: </span><span class="weather-details-value">${
-            weather.current.relative_humidity_2m
-          }${weather.current_units.relative_humidity_2m}</span>
-          </div>
-          <div class="weather-details">
-          <span class="weather-details-label">Feels like: </span><span class="weather-details-value">${
-            weather.current.apparent_temperature
-          }${weather.current_units.apparent_temperature}</span>
-          </div>
-        `;
-    const weatherContainer = document.getElementById("weather-container");
-    weatherContainer.innerHTML = html;
-    const editLocation = document.getElementById("edit-location");
-    editLocation?.addEventListener("click", () => {
-      locationModal.style.display = "flex";
-    });
-  } catch (error) {
-    console.error("Failed to load weather:", error);
-  }
-}
-
-loadWeather();
-
-const addLocationButton = document.getElementById("add-location");
-const editLocation = document.getElementById("edit-location");
-const locationModal = document.getElementById("add-weather-location-modal");
-const locationForm = document.getElementById("add-location-form");
-const locationCancel = document.getElementById("cancel-add-location");
-const autoLocButton = document.getElementById("auto-loc-button");
-
-async function addLocation(location, lat, lon) {
-  const currentTime = new Date().getTime();
-  const weather = await fetchWeather(lat, lon);
-  localStorage.setItem(
-    "weather",
-    JSON.stringify({
-      timestamp: currentTime,
-      location: location,
-      lat: lat,
-      lon: lon,
-      weatherData: weather,
-    })
-  );
-  loadWeather();
-}
-
-function showPosition(position) {
-  const lat = document.getElementById("lat");
-  const lon = document.getElementById("lon");
-  lat.value = position.coords.latitude.toPrecision(6);
-  lon.value = position.coords.longitude.toPrecision(6);
-}
-
-autoLocButton.addEventListener("click", () => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition);
-  } else {
-    alert("Geolocation is not supported.");
-  }
-});
-
-editLocation?.addEventListener("click", () => {
-  locationModal.style.display = "flex";
-});
-
-addLocationButton?.addEventListener("click", () => {
-  locationModal.style.display = "flex";
-});
-
-locationCancel.addEventListener("click", () => {
-  locationModal.style.display = "none";
-  locationForm.reset();
-});
-
-locationModal.addEventListener("click", (e) => {
-  if (e.target === locationModal) {
+    addLocation(name, lat, lon);
     locationModal.style.display = "none";
     locationForm.reset();
+  });
+}
+
+// Quote Implementation
+async function fetchQuote() {
+  try {
+    const response = await fetch("https://thequoteshub.com/api/");
+    if (!response.ok) {
+      throw new Error("Failed to fetch quote");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching quote:", error);
+    // Return a fallback quote
+    return {
+      text: "The best way to predict the future is to invent it.",
+      author: "Alan Kay",
+    };
   }
-});
+}
 
-locationForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const name = document.getElementById("location-name").value;
-  const lat = document.getElementById("lat").value;
-  const lon = document.getElementById("lon").value;
-  addLocation(name, lat, lon);
-  locationModal.style.display = "none";
-  locationForm.reset();
-});
+async function loadQuote() {
+  const quotesContainer = document.getElementById("quotes-section");
+  if (!quotesContainer) return;
 
-// Search bar
+  try {
+    let quote;
+    const today = new Date().toLocaleDateString();
+    const storedData = localStorage.getItem("dailyQuote");
 
+    if (storedData) {
+      const { date, quoteData } = JSON.parse(storedData);
+
+      if (date === today) {
+        // Use stored quote if it's from today
+        quote = quoteData;
+      } else {
+        // Fetch new quote if date has changed
+        quote = await fetchQuote();
+        localStorage.setItem(
+          "dailyQuote",
+          JSON.stringify({
+            date: today,
+            quoteData: quote,
+          })
+        );
+      }
+    } else {
+      // First time fetching quote
+      quote = await fetchQuote();
+      localStorage.setItem(
+        "dailyQuote",
+        JSON.stringify({
+          date: today,
+          quoteData: quote,
+        })
+      );
+    }
+
+    const html = `
+      <blockquote>&ldquo;${quote.text}&rdquo; <footer>&mdash; <cite>${quote.author}</cite></footer></blockquote>
+    `;
+    quotesContainer.innerHTML = html;
+  } catch (error) {
+    console.error("Failed to load quote:", error);
+    quotesContainer.innerHTML = `
+      <blockquote>&ldquo;Simplicity is the ultimate sophistication.&rdquo; <footer>&mdash; <cite>Leonardo da Vinci</cite></footer></blockquote>
+    `;
+  }
+}
+
+// Search functionality
 class SearchBar {
   constructor() {
     this.form = document.getElementById("searchForm");
     this.input = document.getElementById("searchInput");
     this.suggestionsContainer = document.getElementById("suggestionsContainer");
+
+    if (!this.form || !this.input || !this.suggestionsContainer) return;
+
     this.selectedIndex = -1;
     this.suggestions = [];
 
     this.initializeEventListeners();
     this.loadUrlHistory();
-    this.input.focus();
+
+    // Focus search on page load
+    setTimeout(() => this.input.focus(), 500);
   }
 
   initializeEventListeners() {
@@ -766,6 +909,7 @@ class SearchBar {
   handleSubmit(e) {
     e.preventDefault();
     const query = this.input.value.trim();
+    if (!query) return;
     this.navigateToInput(query);
   }
 
@@ -890,5 +1034,53 @@ class SearchBar {
   }
 }
 
-// Initialize the search bar
-new SearchBar();
+// Initialize Application
+function initApp() {
+  // Initialize theme toggle
+  initThemeToggle();
+
+  // Initialize quick links
+  loadSites();
+  initModals();
+
+  // Initialize clock
+  initClock();
+
+  // Initialize weather
+  initWeather();
+
+  // Initialize quotes
+  loadQuote();
+
+  // Initialize Todoist
+  const todoist = new TodoistIntegration();
+  window.todoist = todoist; // Make it globally accessible for click handlers
+  todoist.initialize();
+
+  // Initialize goals
+  initGoals();
+
+  // Initialize search
+  new SearchBar();
+}
+
+// Run initialization when DOM is fully loaded
+document.addEventListener("DOMContentLoaded", initApp);
+
+// Mark as loaded when everything is ready
+function markAsLoaded() {
+  document.body.classList.add("loaded");
+  setTimeout(() => {
+    const loadingScreen = document.getElementById("loading-screen");
+    if (loadingScreen && loadingScreen.parentNode) {
+      loadingScreen.parentNode.removeChild(loadingScreen);
+    }
+  }, 300);
+}
+
+if (document.readyState === "complete") {
+  markAsLoaded();
+} else {
+  window.addEventListener("load", markAsLoaded);
+  setTimeout(markAsLoaded, 2000); // Fallback
+}
