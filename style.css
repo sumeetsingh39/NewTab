@@ -411,7 +411,8 @@ textarea:focus {
   transition: var(--transition);
   position: relative;
   width: 80px;
-  height: 80px;
+  height: -moz-fit-content;
+  height: fit-content;
   justify-content: center;
   box-shadow: var(--box-shadow);
 }
@@ -440,6 +441,7 @@ textarea:focus {
   font-size: 0.8rem;
   text-align: center;
   margin-top: var(--spacing-xs);
+  overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
 }
@@ -680,7 +682,7 @@ textarea:focus {
   text-decoration: none;
   color: var(--text-primary);
   transition: var(--transition);
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .task-content.completed {
@@ -789,6 +791,10 @@ textarea:focus {
   padding: var(--spacing-xl);
 }
 
+#setup-todoist {
+  margin: auto;
+}
+
 /* Goals styling */
 .goal {
   font-family: "Bookerly", "JetBrains Mono", monospace;
@@ -805,7 +811,7 @@ textarea:focus {
 .goal p {
   margin-bottom: 0;
   flex: 1;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .goal .remove-goal {
@@ -831,6 +837,7 @@ textarea:focus {
 
 /* ======= BUTTONS ======= */
 .button {
+  font-family: "JetBrains Mono", monospace;
   padding: var(--spacing-sm) var(--spacing-lg);
   border: none;
   cursor: pointer;
