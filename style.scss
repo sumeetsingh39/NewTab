@@ -687,7 +687,7 @@ textarea:focus {
   text-decoration: none;
   color: var(--text-primary);
   transition: var(--transition);
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .task-content.completed {
@@ -816,7 +816,7 @@ textarea:focus {
 .goal p {
   margin-bottom: 0;
   flex: 1;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .goal .remove-goal {
