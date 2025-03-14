@@ -417,7 +417,7 @@ textarea:focus {
   transition: var(--transition);
   position: relative;
   width: 80px;
-  height: 80px;
+  height: fit-content;
   justify-content: center;
   box-shadow: var(--box-shadow);
 }
@@ -446,6 +446,7 @@ textarea:focus {
   font-size: 0.8rem;
   text-align: center;
   margin-top: var(--spacing-xs);
+  overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
 }
@@ -793,6 +794,10 @@ textarea:focus {
 .todoist-setup {
   text-align: center;
   padding: var(--spacing-xl);
+}
+
+#setup-todoist {
+  margin: auto;
 }
 
 /* Goals styling */
