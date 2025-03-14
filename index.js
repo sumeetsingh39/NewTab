@@ -475,63 +475,63 @@ const todoist = new TodoistIntegration();
 todoist.initialize();
 
 // Quote Implementation
-async function fetchQuote() {
-  const response = await fetch("https://thequoteshub.com/api/");
-  if (!response.ok) {
-    throw new Error("Failed to fetch quote");
-  }
-  return await response.json();
-}
+// async function fetchQuote() {
+//   const response = await fetch("https://thequoteshub.com/api/");
+//   if (!response.ok) {
+//     throw new Error("Failed to fetch quote");
+//   }
+//   return await response.json();
+// }
 
-async function loadQuote() {
-  try {
-    let quote;
-    const today = new Date().toLocaleDateString();
-    const storedData = localStorage.getItem("dailyQuote");
+// async function loadQuote() {
+//   try {
+//     let quote;
+//     const today = new Date().toLocaleDateString();
+//     const storedData = localStorage.getItem("dailyQuote");
 
-    if (storedData) {
-      const { date, quoteData } = JSON.parse(storedData);
+//     if (storedData) {
+//       const { date, quoteData } = JSON.parse(storedData);
 
-      if (date === today) {
-        // Use stored quote if it's from today
-        quote = quoteData;
-        console.log("Quote loaded from storage");
-      } else {
-        // Fetch new quote if date has changed
-        quote = await fetchQuote();
-        localStorage.setItem(
-          "dailyQuote",
-          JSON.stringify({
-            date: today,
-            quoteData: quote,
-          })
-        );
-        console.log("New quote fetched and stored");
-      }
-    } else {
-      // First time fetching quote
-      quote = await fetchQuote();
-      localStorage.setItem(
-        "dailyQuote",
-        JSON.stringify({
-          date: today,
-          quoteData: quote,
-        })
-      );
-      console.log("First quote fetched and stored");
-    }
+//       if (date === today) {
+//         // Use stored quote if it's from today
+//         quote = quoteData;
+//         console.log("Quote loaded from storage");
+//       } else {
+//         // Fetch new quote if date has changed
+//         quote = await fetchQuote();
+//         localStorage.setItem(
+//           "dailyQuote",
+//           JSON.stringify({
+//             date: today,
+//             quoteData: quote,
+//           })
+//         );
+//         console.log("New quote fetched and stored");
+//       }
+//     } else {
+//       // First time fetching quote
+//       quote = await fetchQuote();
+//       localStorage.setItem(
+//         "dailyQuote",
+//         JSON.stringify({
+//           date: today,
+//           quoteData: quote,
+//         })
+//       );
+//       console.log("First quote fetched and stored");
+//     }
 
-    const html = `
-        <blockquote>&ldquo;${quote.text}&rdquo; <footer>&mdash; <cite>${quote.author}</cite></footer></blockquote>
-      `;
-    const quotesContainer = document.getElementById("quotes-section");
-    quotesContainer.innerHTML = html;
-  } catch (error) {
-    console.log("Failed to load quote:", error);
-  }
-}
+//     const html = `
+//         <blockquote>&ldquo;${quote.text}&rdquo; <footer>&mdash; <cite>${quote.author}</cite></footer></blockquote>
+//       `;
+//     const quotesContainer = document.getElementById("quotes-section");
+//     quotesContainer.innerHTML = html;
+//   } catch (error) {
+//     console.log("Failed to load quote:", error);
+//   }
+// }
 
-loadQuote();
+// loadQuote();
 
 // Weather
 
@@ -585,7 +585,7 @@ async function loadWeather() {
     }
 
     const html = `
-        <span id="edit-location" class="edit"><svg fill="#000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 528.899 528.899" xml:space="preserve">
+        <span id="edit-location" class="edit"><svg fill="#fff" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 528.899 528.899" xml:space="preserve">
 <g>
 	<path d="M328.883,89.125l107.59,107.589l-272.34,272.34L56.604,361.465L328.883,89.125z M518.113,63.177l-47.981-47.981   c-18.543-18.543-48.653-18.543-67.259,0l-45.961,45.961l107.59,107.59l53.611-53.611   C532.495,100.753,532.495,77.559,518.113,63.177z M0.3,512.69c-1.958,8.812,5.998,16.708,14.811,14.565l119.891-29.069   L27.473,390.597L0.3,512.69z"/>
 </g>
