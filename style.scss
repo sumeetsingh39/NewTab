@@ -53,6 +53,89 @@ html[data-theme="light"] {
   --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   --box-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
+html[data-theme="catppuccin-mocha"] {
+  --primary-color: #89b4fa;
+  --primary-color-hover: #b4befe;
+  --primary-color-transparent: rgba(203, 166, 247, 0.1);
+  --text-primary: #cdd6f4;
+  --text-secondary: #a6adc8;
+  --background: #1e1e2e;
+  --card-background: #181825;
+  --surface-1: #313244;
+  --surface-2: #45475a;
+  --surface-3: #585b70;
+  --danger: #f38ba8;
+  --success: #a6e3a1;
+  --warning: #f9e2af;
+  --info: #89b4fa;
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --box-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* Add Gruvbox Dark theme colors */
+html[data-theme="gruvbox-dark"] {
+  --primary-color: #458588;
+  --primary-color-hover: #83a598;
+  --primary-color-transparent: rgba(184, 187, 38, 0.1);
+  --text-primary: #ebdbb2;
+  --text-secondary: #d5c4a1;
+  --background: #282828;
+  --card-background: #32302f;
+  --surface-1: #3c3836;
+  --surface-2: #504945;
+  --surface-3: #665c54;
+  --danger: #fb4934;
+  --success: #b8bb26;
+  --warning: #fabd2f;
+  --info: #83a598;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  --box-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.35);
+}
+
+/* Theme Selector Styles */
+.theme-selector {
+  position: fixed;
+  top: var(--spacing-md);
+  right: calc(var(--spacing-md) + 50px); /* Position next to theme toggle */
+  background: var(--surface-2);
+  border: 1px solid var(--surface-3);
+  border-radius: var(--border-radius);
+  z-index: 100;
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.theme-selector select {
+  background: var(--surface-1);
+  color: var(--text-primary);
+  border: none;
+  padding: 8px 30px 8px 12px;
+  appearance: none;
+  cursor: pointer;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.85rem;
+  transition: var(--transition);
+  height: 2rem;
+}
+
+.theme-selector:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow-hover);
+}
+
+.theme-selector::after {
+  content: "▼";
+  color: var(--primary-color);
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 0.7rem;
+}
 
 /* ======= RESET & BASE STYLES ======= */
 * {
@@ -1239,7 +1322,13 @@ html[data-theme="light"] .theme-toggle svg {
 }
 
 /* Image color inversion for dark mode */
-html[data-theme="dark"] .quick-link img {
+:is(
+    html[data-theme="dark"],
+    html[data-theme="catppuccin-mocha"],
+    html[data-theme="gruvbox-dark"]
+  )
+  .quick-link
+  img {
   filter: invert(1) brightness(0.9);
   opacity: 0.9;
 }
@@ -1250,7 +1339,19 @@ html[data-theme="dark"] .quick-link img {
 }
 
 /* Keep the weather icons properly colored as they might already have the right colors */
-html[data-theme="dark"] .weather-section img,
-html[data-theme="dark"] .nav-weather img {
+:is(
+    html[data-theme="dark"],
+    html[data-theme="catppuccin-mocha"],
+    html[data-theme="gruvbox-dark"]
+  )
+  .weather-section
+  img,
+:is(
+    html[data-theme="dark"],
+    html[data-theme="catppuccin-mocha"],
+    html[data-theme="gruvbox-dark"]
+  )
+  .nav-weather
+  img {
   filter: invert(0.8); /* Slightly different treatment for weather icons */
 }

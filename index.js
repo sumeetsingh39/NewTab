@@ -13,24 +13,62 @@
   } else {
     document.documentElement.setAttribute("data-theme", "light");
   }
+
+  // Set select value to match current theme if element exists
+  const themeSelect = document.getElementById("theme-select");
+  if (themeSelect) {
+    themeSelect.value = savedTheme || (prefersDark ? "dark" : "light");
+  }
 })();
 function initThemeToggle() {
   const themeToggle = document.getElementById("theme-toggle");
   if (!themeToggle) return;
 
   themeToggle.addEventListener("click", () => {
-    // Get current theme
+    // Toggle between dark and light mode only
     const currentTheme =
       document.documentElement.getAttribute("data-theme") || "dark";
-    // Set new theme
-    const newTheme = currentTheme === "dark" ? "light" : "dark";
 
-    // Apply the theme
-    document.documentElement.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
+    // Only toggle between dark and light, preserving other themes
+    if (currentTheme === "dark" || currentTheme === "light") {
+      const newTheme = currentTheme === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
 
-    console.log("Theme changed to:", newTheme); // For debugging
+      // Update select value if it exists
+      const themeSelect = document.getElementById("theme-select");
+      if (themeSelect) {
+        themeSelect.value = newTheme;
+      }
+    } else {
+      // If current theme is neither dark nor light, set to light if it looks dark, dark otherwise
+      const isDarkTheme = ["catppuccin-mocha", "gruvbox-dark"].includes(
+        currentTheme
+      );
+      const newTheme = isDarkTheme ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+
+      // Update select value if it exists
+      const themeSelect = document.getElementById("theme-select");
+      if (themeSelect) {
+        themeSelect.value = newTheme;
+      }
+    }
+
+    console.log("Theme changed via toggle button");
   });
+
+  // Add event listener for the theme selector
+  const themeSelect = document.getElementById("theme-select");
+  if (themeSelect) {
+    themeSelect.addEventListener("change", () => {
+      const selectedTheme = themeSelect.value;
+      document.documentElement.setAttribute("data-theme", selectedTheme);
+      localStorage.setItem("theme", selectedTheme);
+      console.log("Theme changed to:", selectedTheme);
+    });
+  }
 }
 
 // Site Management
